@@ -1,0 +1,349 @@
+{
+  "profile": {
+    "name": "Jeeva SenthilKumar",
+    "phone": "+91 7904030647",
+    "email": "jeevasenthilkumar0225@gmail.com",
+    "linkedIn": "https://www.linkedin.com/in/jeeva-sk",
+    "github": "https://github.com/jeeva-sk",
+    "additionalLinks": [],
+    "targetRoles": [
+      "AI/ML Engineer",
+      "Full Stack Developer"
+    ],
+    "summary": "I'm a final-year B.Tech Information Technology (Honours) student at Anna University with an 8.03 CGPA. I build real-world AI applications, computer vision systems, and modern full-stack web software. Passionate about turning complex machine learning algorithms into practical tools like smart mobility wheelchairs, vision glasses for the visually impaired, and scalable web apps.",
+    "education": [
+      {
+        "id": "edu-1",
+        "degree": "B.Tech (Honours) Information Technology",
+        "institution": "M.A.M. College of Engineering & Technology, Trichy (Anna University)",
+        "duration": "Aug 2023 – Sep 2027 (Expected)",
+        "score": "CGPA: 8.03",
+        "details": "Specializing in AI, Computer Vision, Deep Learning, and Full Stack Web Architecture."
+      },
+      {
+        "id": "edu-2",
+        "degree": "HSC (Higher Secondary Certificate)",
+        "institution": "St. James Higher Secondary School, Palakurichy",
+        "board": "Tamil Nadu State Board",
+        "duration": "2023",
+        "score": "76.5%",
+        "details": "Focus on Physics, Chemistry, Mathematics, and Computer Science."
+      },
+      {
+        "id": "edu-3",
+        "degree": "SSLC (Secondary School Leaving Certificate)",
+        "institution": "St. James Higher Secondary School, Palakurichy",
+        "board": "Tamil Nadu State Board",
+        "duration": "2021",
+        "score": "Completed Secondary Education",
+        "isPlaceholder": false,
+        "details": "General Secondary School Curriculum."
+      }
+    ],
+    "softSkills": [
+      "Problem Solving",
+      "Team Collaboration",
+      "Quick Learning",
+      "Critical Thinking",
+      "Communication",
+      "Adaptability"
+    ],
+    "languages": [
+      "English",
+      "Tamil"
+    ],
+    "strengths": [
+      "AI Application Engineering",
+      "Computer Vision",
+      "Full Stack Development",
+      "Hardware Integration",
+      "Fast Learner"
+    ],
+    "areasOfInterest": [
+      "Artificial Intelligence",
+      "Machine Learning",
+      "Computer Vision",
+      "Full Stack Development",
+      "Assistive Technologies"
+    ],
+    "hackathons": [
+      {
+        "id": "hack-1",
+        "title": "INCEPTIA National Hackathon",
+        "location": "Pune, Maharashtra",
+        "role": "Team Developer",
+        "description": "Participated in a national engineering hackathon in Pune where we pitched and built prototypes for smart AI accessibility solutions."
+      }
+    ],
+    "achievements": [
+      {
+        "id": "ach-1",
+        "title": "Selected for B.Tech Honours Track",
+        "description": "Chosen for the B.Tech Honours degree track based on consistent academic standing."
+      },
+      {
+        "id": "ach-2",
+        "title": "Built Working Assistive AI Prototypes",
+        "description": "Engineered functional Smart Mobility Wheelchair and AI Smart Glasses for elderly and visually impaired users."
+      }
+    ]
+  },
+  "skills": [
+    {
+      "category": "Programming Languages",
+      "items": [
+        {
+          "name": "Python",
+          "level": "Proficient"
+        },
+        {
+          "name": "Java",
+          "level": "Familiar"
+        },
+        {
+          "name": "C",
+          "level": "Familiar"
+        }
+      ]
+    },
+    {
+      "category": "Web Development",
+      "items": [
+        {
+          "name": "HTML5",
+          "level": "Advanced"
+        },
+        {
+          "name": "CSS3",
+          "level": "Advanced"
+        },
+        {
+          "name": "JavaScript",
+          "level": "Proficient"
+        },
+        {
+          "name": "React.js",
+          "level": "Proficient"
+        },
+        {
+          "name": "Node.js",
+          "level": "Proficient"
+        },
+        {
+          "name": "Express.js",
+          "level": "Proficient"
+        }
+      ]
+    },
+    {
+      "category": "AI / ML & Vision",
+      "items": [
+        {
+          "name": "Machine Learning",
+          "level": "Proficient"
+        },
+        {
+          "name": "Computer Vision",
+          "level": "Proficient"
+        },
+        {
+          "name": "Deep Learning",
+          "level": "Basics"
+        },
+        {
+          "name": "OpenCV",
+          "level": "Proficient"
+        },
+        {
+          "name": "YOLO (v8)",
+          "level": "Proficient"
+        },
+        {
+          "name": "OCR",
+          "level": "Proficient"
+        }
+      ]
+    },
+    {
+      "category": "Database Systems",
+      "items": [
+        {
+          "name": "MongoDB",
+          "level": "Proficient"
+        }
+      ]
+    },
+    {
+      "category": "Developer Tools",
+      "items": [
+        {
+          "name": "Git",
+          "level": "Proficient"
+        },
+        {
+          "name": "GitHub",
+          "level": "Proficient"
+        },
+        {
+          "name": "VS Code",
+          "level": "Proficient"
+        },
+        {
+          "name": "Jupyter Notebook",
+          "level": "Proficient"
+        }
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "id": "exp-1",
+      "company": "Cybernaut Edu-Tech LLP",
+      "role": "AI & Machine Learning Intern",
+      "duration": "20 Jun 2025 – 19 Jul 2025",
+      "project": "Student Performance Prediction",
+      "responsibilities": [
+        "Built predictive machine learning models to forecast student academic success based on study patterns and past grades.",
+        "Handled data cleaning, feature engineering, and training classification models with Scikit-learn.",
+        "Evaluated model accuracy and created visual charts for performance insights."
+      ]
+    },
+    {
+      "id": "exp-2",
+      "company": "Viruzverse Solutions",
+      "role": "AI & Machine Learning Intern",
+      "duration": "06 Dec – 30 Dec",
+      "project": "Face Mask Detection System",
+      "responsibilities": [
+        "Developed a real-time mask detection pipeline using OpenCV and webcam video feeds.",
+        "Trained Convolutional Neural Networks (CNNs) to classify masked vs. unmasked faces in varied lighting conditions.",
+        "Optimized frame processing rates to maintain smooth real-time video performance."
+      ]
+    },
+    {
+      "id": "exp-3",
+      "company": "SVASTI Technology Solutions",
+      "role": "Full Stack Development Intern",
+      "duration": "01 Mar 2024 – 15 Mar 2024",
+      "project": "Student Course Management Portal",
+      "responsibilities": [
+        "Built a full-stack web application for student course registration and admin management.",
+        "Created RESTful backend API routes using Express.js and stored records in MongoDB.",
+        "Designed responsive UI screens using React.js and Tailwind CSS."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-1",
+      "title": "Smart Mobility Wheelchair using AI Vision",
+      "category": "AI / Vision",
+      "techStack": [
+        "Python",
+        "OpenCV",
+        "YOLOv8",
+        "Raspberry Pi",
+        "ESP32-CAM",
+        "Text-to-Speech"
+      ],
+      "description": "An AI-powered wheelchair built for elderly and disabled individuals to detect obstacles in real-time and provide voice alerts.",
+      "longDescription": "I built an assistive wheelchair prototype designed to help elderly and disabled users move safely. Using an ESP32-CAM and a Raspberry Pi running YOLOv8 object detection, the system identifies obstacles in the wheelchair's path and triggers instant voice alerts through Text-to-Speech.",
+      "githubUrl": "https://github.com/jeeva-sk/smart-mobility-wheelchair",
+      "liveUrl": "",
+      "featured": true
+    },
+    {
+      "id": "proj-2",
+      "title": "AI Smart Glass Navigation Assistant",
+      "category": "AI / Vision",
+      "techStack": [
+        "Python",
+        "OpenCV",
+        "YOLOv8",
+        "OCR",
+        "Raspberry Pi",
+        "ESP32-CAM"
+      ],
+      "description": "Wearable smart glasses for visually impaired users with obstacle detection, text reading (OCR), and voice guidance.",
+      "longDescription": "A wearable smart glass device powered by Raspberry Pi and ESP32-CAM. It assists visually impaired users by detecting obstacles via YOLOv8, reading signs or book text out loud using Optical Character Recognition (OCR), and giving voice navigation cues.",
+      "githubUrl": "https://github.com/jeeva-sk/ai-smart-glasses",
+      "liveUrl": "",
+      "featured": true
+    },
+    {
+      "id": "proj-3",
+      "title": "AI Detects – Deepfake & Synthetic Media Detector",
+      "category": "AI / ML",
+      "techStack": [
+        "Python",
+        "TensorFlow",
+        "CNN",
+        "OpenCV"
+      ],
+      "description": "A machine learning system that detects whether an image is real or AI-generated.",
+      "longDescription": "I developed a deep learning classifier in TensorFlow to detect AI-generated images and deepfakes. The Convolutional Neural Network (CNN) analyzes subtle pixel patterns to distinguish between real camera photographs and synthetic AI media.",
+      "githubUrl": "https://github.com/jeeva-sk/ai-detects-media",
+      "liveUrl": "",
+      "featured": true
+    },
+    {
+      "id": "proj-4",
+      "title": "Career Compass",
+      "category": "Full Stack / ML",
+      "techStack": [
+        "Python",
+        "Machine Learning",
+        "HTML5",
+        "CSS3",
+        "JavaScript"
+      ],
+      "description": "An intelligent career guidance web platform that recommends career paths based on student skill assessment.",
+      "longDescription": "Career Compass is a web application that helps students discover matching career fields. It analyzes quiz responses and skill inputs using machine learning logic to generate personalized career recommendations.",
+      "githubUrl": "https://github.com/jeeva-sk/career-compass",
+      "liveUrl": "",
+      "featured": false
+    },
+    {
+      "id": "proj-5",
+      "title": "Project Management System",
+      "category": "Full Stack",
+      "techStack": [
+        "React.js",
+        "Node.js",
+        "Express.js",
+        "MongoDB"
+      ],
+      "description": "A full-stack project tracking application with task assignment, user auth, and real-time MongoDB backend.",
+      "longDescription": "A full-stack project management app designed for team collaboration. Features task creation, status updates, team assignment, user authentication, and a clean MongoDB backend API.",
+      "githubUrl": "https://github.com/jeeva-sk/project-management-system",
+      "liveUrl": "",
+      "featured": true
+    }
+  ],
+  "certifications": [
+    {
+      "id": "cert-1",
+      "title": "AI & Machine Learning Internship Certificate",
+      "issuer": "Cybernaut Edu-Tech LLP",
+      "date": "July 2025",
+      "description": "Awarded for machine learning model development and student performance analysis.",
+      "driveUrl": "https://drive.google.com/drive/folders/cert-cybernaut-placeholder"
+    },
+    {
+      "id": "cert-2",
+      "title": "AI & Machine Learning Internship Certificate",
+      "issuer": "Viruzverse Solutions",
+      "date": "December 2024",
+      "description": "Recognized for real-time computer vision face mask detection development.",
+      "driveUrl": "https://drive.google.com/drive/folders/cert-viruzverse-placeholder"
+    },
+    {
+      "id": "cert-3",
+      "title": "Full Stack Development Internship Certificate",
+      "issuer": "SVASTI Technology Solutions",
+      "date": "March 2024",
+      "description": "Certified for building web applications with React.js, Express.js & MongoDB.",
+      "driveUrl": "https://drive.google.com/drive/folders/cert-svasti-placeholder"
+    }
+  ]
+}

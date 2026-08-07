@@ -1,0 +1,87 @@
+[
+  {
+    "id": "msg-1786091486893-ye16j",
+    "name": "jeeeva",
+    "email": "jeevasenthilkumar0225@gmail.com",
+    "subject": "hiiiiiiii",
+    "message": "just testing",
+    "createdAt": "Aug 7, 2026, 2:01 PM",
+    "timestamp": 1786091486889,
+    "isRead": false,
+    "notificationSent": true
+  },
+  {
+    "id": "msg-1786086064008-o876t",
+    "name": "jeeva",
+    "email": "jeevasenthilkumar0225@gmail.com",
+    "subject": "k;febliewufh",
+    "message": "iugegfijhewljfn;o",
+    "createdAt": "Aug 7, 2026, 12:31 PM",
+    "timestamp": 1786086064002,
+    "isRead": false,
+    "notificationSent": false
+  },
+  {
+    "id": "msg-1786085638354-tttgw",
+    "name": "jeeva",
+    "email": "jeevasenthilkumar0225@gmail.com",
+    "subject": "sym,anjd",
+    "message": "guilwelfibwle",
+    "createdAt": "Aug 7, 2026, 12:23 PM",
+    "timestamp": 1786085638351,
+    "isRead": false,
+    "notificationSent": false
+  },
+  {
+    "id": "msg-1786085211214-twg9r",
+    "name": "jeevassss",
+    "email": "jeevasenthilkumar0225@gmail.com",
+    "subject": "fbjjdnfsoif",
+    "message": "bwilbfijnewfn",
+    "createdAt": "Aug 7, 2026, 12:16 PM",
+    "timestamp": 1786085211209,
+    "isRead": true,
+    "notificationSent": false,
+    "read": true
+  },
+  {
+    "id": "msg-1786084552198-ib5w6",
+    "name": "fjbfuligqf",
+    "email": "jeeva.it23@mamcet.com",
+    "subject": "jwrgiuw",
+    "message": "jrbjligjhrwq",
+    "date": "Aug 7, 2026, 12:05 PM",
+    "timestamp": 1786084552198,
+    "read": false
+  },
+  {
+    "id": "msg-1786084529040-0komb",
+    "name": "SCJHIU",
+    "email": "jeevasenthilkumar0225@gmail.com",
+    "subject": "EJWVHLURH",
+    "message": "JOHR9UPYp;ufi;ewjfipwj",
+    "date": "Aug 7, 2026, 12:05 PM",
+    "timestamp": 1786084529061,
+    "read": false
+  },
+  {
+    "id": "msg-1786084201972-ahkvx",
+    "name": "jeeva",
+    "email": "jeevasenthilkumar0225@gmail.com",
+    "subject": "jvkhmhbihldfs",
+    "message": "jkfbwkjfgidwb.vjobe ligfl",
+    "date": "Aug 7, 2026, 12:00 PM",
+    "timestamp": 1786084201990,
+    "read": true
+  },
+  {
+    "id": "msg-1786083804393-p9pzx",
+    "name": "jeeva",
+    "email": "jeeva.it23@mamcet.com",
+    "subject": "just tested",
+    "message": "summa than just tested",
+    "date": "Aug 7, 2026, 11:53 AM",
+    "timestamp": 1786083804416,
+    "read": true
+  }
+]
