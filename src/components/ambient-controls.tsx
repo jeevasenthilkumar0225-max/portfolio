@@ -17,9 +17,7 @@ export function AmbientControls({ startMusic = false }: AmbientControlsProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const audioRef = useRef<AudioContext | null>(null);
-  const masterRef = useRef<GainNode | null>(null);
-  const timerRef = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const startedRef = useRef(false);
 
   const toggleFullscreen = () => {
@@ -36,75 +34,32 @@ export function AmbientControls({ startMusic = false }: AmbientControlsProps) {
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, []);
 
+  const [audioError, setAudioError] = useState<string | null>(null);
+
   const startMusicFn = () => {
-    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
-    if (!Ctx) return;
-
     if (!audioRef.current) {
-      const ctx = new Ctx();
-      audioRef.current = ctx;
-
-      const master = ctx.createGain();
-      master.gain.value = 0.0;
-      master.connect(ctx.destination);
-      masterRef.current = master;
-
-      const gain = ctx.createGain();
-      gain.gain.value = 0.5;
-      gain.connect(master);
-
-      const notes = [110, 164.81, 220, 277.18, 329.63];
-      notes.forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-        osc.frequency.value = freq;
-        osc.detune.value = (Math.random() - 0.5) * 8;
-
-        const oGain = ctx.createGain();
-        oGain.gain.value = 0.08;
-
-        const lfo = ctx.createOscillator();
-        lfo.frequency.value = 0.05 + Math.random() * 0.05;
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.value = 0.05 + Math.random() * 0.03;
-        lfo.connect(lfoGain);
-        lfoGain.connect(oGain.gain);
-
-        osc.connect(oGain);
-        oGain.connect(gain);
-        osc.start();
-        lfo.start();
-      });
+      const audio = new Audio('/music.mp3');
+      audio.loop = true;
+      audio.volume = isMuted ? 0 : 0.8;
+      audio.onerror = (e) => {
+        console.error('Audio failed to load from /music.mp3:', e);
+        setAudioError('music.mp3 not found in public/ folder');
+      };
+      audioRef.current = audio;
     }
-
-    if (audioRef.current.state === 'suspended') {
-      audioRef.current.resume();
-    }
-
-    if (masterRef.current && audioRef.current) {
-      masterRef.current.gain.cancelScheduledValues(audioRef.current.currentTime);
-      masterRef.current.gain.linearRampToValueAtTime(
-        isMuted ? 0 : 0.5,
-        audioRef.current.currentTime + 1
-      );
-    }
+    
+    setAudioError(null);
+    audioRef.current.play().catch((err) => {
+      console.warn('Playback failed. Gesture required.', err);
+    });
     setIsPlaying(true);
   };
 
   const stopMusicFn = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    if (audioRef.current && masterRef.current) {
-      masterRef.current.gain.cancelScheduledValues(audioRef.current.currentTime);
-      masterRef.current.gain.linearRampToValueAtTime(
-        0,
-        audioRef.current.currentTime + 0.4
-      );
+    if (audioRef.current) {
+      audioRef.current.pause();
     }
     setIsPlaying(false);
-    const ctx = audioRef.current;
-    timerRef.current = window.setTimeout(() => {
-      ctx?.suspend();
-    }, 500);
   };
 
   const toggleMusic = () => {
@@ -118,12 +73,8 @@ export function AmbientControls({ startMusic = false }: AmbientControlsProps) {
   const toggleMute = () => {
     const next = !isMuted;
     setIsMuted(next);
-    if (masterRef.current && audioRef.current) {
-      masterRef.current.gain.cancelScheduledValues(audioRef.current.currentTime);
-      masterRef.current.gain.linearRampToValueAtTime(
-        next ? 0 : 0.5,
-        audioRef.current.currentTime + 0.3
-      );
+    if (audioRef.current) {
+      audioRef.current.volume = next ? 0 : 0.8;
     }
   };
 
@@ -152,8 +103,9 @@ export function AmbientControls({ startMusic = false }: AmbientControlsProps) {
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      audioRef.current?.close?.();
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
     };
   }, []);
 
@@ -162,6 +114,13 @@ export function AmbientControls({ startMusic = false }: AmbientControlsProps) {
 
   return (
     <div className="fixed top-4 right-4 z-[60] flex items-center gap-2">
+      {/* Audio load error badge */}
+      {audioError && (
+        <span className="text-[10px] font-mono font-bold bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-1.5 rounded-xl">
+          ⚠️ {audioError}
+        </span>
+      )}
+
       {/* Theme toggle */}
       <motion.button
         whileHover={{ scale: 1.1, rotate: 6 }}
