@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Home, User, Code2, Briefcase, FolderGit2, Award, MessageSquare, Cpu } from 'lucide-react';
+import { Home, User, Code2, Briefcase, FolderGit2, Award, MessageSquare, Cpu, GitBranch } from 'lucide-react';
+import { Github as GithubIcon } from './icons';
 
 interface DockProps {
   active: string;
@@ -15,6 +16,7 @@ const ITEMS = [
   { id: 'skills', label: 'Skills', icon: Code2 },
   { id: 'experience', label: 'Experience', icon: Briefcase },
   { id: 'projects', label: 'Projects', icon: FolderGit2 },
+  { id: 'github', label: 'GitHub', icon: GithubIcon },
   { id: 'certificates', label: 'Certificates', icon: Award },
   { id: 'contact', label: 'Contact', icon: MessageSquare },
 ];

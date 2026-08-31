@@ -23,7 +23,6 @@ const NODE_POS: Record<string, { x: number; y: number }> = {
   JavaScript: { x: 30, y: 90 },
   HTML: { x: 55, y: 90 },
   CSS: { x: 75, y: 90 },
-  Docker: { x: 88, y: 55 },
   Git: { x: 8, y: 50 },
 };
 
@@ -46,8 +45,6 @@ const CONNECTIONS: [string, string][] = [
   ['React', 'CSS'],
   ['Git', 'Python'],
   ['Git', 'React'],
-  ['Docker', 'Node.js'],
-  ['Docker', 'Python'],
   ['TensorFlow', 'PyTorch'],
 ];
 
@@ -65,7 +62,6 @@ const CATEGORY: Record<string, string> = {
   JavaScript: 'Core web scripting language',
   HTML: 'Semantic web structure',
   CSS: 'Responsive styling & animation',
-  Docker: 'Containerized deployment & orchestration',
   Git: 'Version control & collaboration',
 };
 
@@ -82,7 +78,6 @@ const CATEGORY_ICON: Record<string, React.ElementType> = {
   JavaScript: Code2,
   HTML: Code2,
   CSS: Code2,
-  Docker: Layers,
   Git: Code2,
 };
 

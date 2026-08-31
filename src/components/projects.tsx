@@ -8,6 +8,7 @@ import { Github } from './icons';
 
 interface ProjectsProps {
   projects: ProjectItem[];
+  onNavigate?: (screen: string) => void;
 }
 
 function HoloCard({ proj, onOpen }: { proj: ProjectItem; onOpen: () => void }) {
@@ -128,8 +129,15 @@ function HoloCard({ proj, onOpen }: { proj: ProjectItem; onOpen: () => void }) {
   );
 }
 
-export function Projects({ projects }: ProjectsProps) {
+export function Projects({ projects, onNavigate }: ProjectsProps) {
   const [selected, setSelected] = useState<ProjectItem | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('All');
+
+  const categories = ['All', ...Array.from(new Set(projects?.map((p) => p.category) ?? []))];
+
+  const filteredProjects = activeCategory === 'All'
+    ? projects
+    : projects?.filter((p) => p.category === activeCategory);
 
   return (
     <div className="min-h-screen flex items-center py-20">
@@ -138,14 +146,29 @@ export function Projects({ projects }: ProjectsProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-10"
+          className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f4b400]/10 border border-[#f4b400]/25 text-amber text-xs font-mono font-medium tracking-widest uppercase">
-            <FolderGit2 className="w-4 h-4" /> Engineering Directory
+          <div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f4b400]/10 border border-[#f4b400]/25 text-amber text-xs font-mono font-medium tracking-widest uppercase">
+              <FolderGit2 className="w-4 h-4" /> Engineering Directory
+            </div>
+            <h2 className="display-h2 text-foreground mt-4">
+              Holographic <span className="gold-text-gradient">Workspace</span>
+            </h2>
           </div>
-          <h2 className="display-h2 text-foreground mt-4">
-            Holographic <span className="gold-text-gradient">Workspace</span>
-          </h2>
+
+          {onNavigate && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onNavigate('github')}
+              className="px-4 py-2.5 rounded-xl bg-card border border-border/80 hover:border-amber/60 text-foreground font-mono text-xs flex items-center gap-2 transition-all self-start md:self-auto"
+            >
+              <Github className="w-4 h-4 text-amber" />
+              <span>Explore GitHub Dashboard</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-amber" />
+            </motion.button>
+          )}
         </motion.div>
 
         {/* Summary intro + stats strip */}
@@ -153,41 +176,34 @@ export function Projects({ projects }: ProjectsProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-10"
+          className="mb-8"
         >
           <p className="body-md text-foreground/70 max-w-3xl">
             A portfolio of applied AI, computer-vision, and full-stack systems — from
             assistive mobility tech and smart glasses for the visually impaired to
             deepfake detection and career guidance platforms.
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-            <div className="flat-surface edge-lit rounded-xl p-4 text-center">
-              <div className="text-2xl font-semibold text-amber counter-value">{projects?.length ?? 0}</div>
-              <div className="caption-mono text-muted">Projects</div>
-            </div>
-            <div className="flat-surface edge-lit rounded-xl p-4 text-center">
-              <div className="text-2xl font-semibold text-amber counter-value">
-                {projects?.filter((p) => p.featured).length ?? 0}
-              </div>
-              <div className="caption-mono text-muted">Featured</div>
-            </div>
-            <div className="flat-surface edge-lit rounded-xl p-4 text-center">
-              <div className="text-2xl font-semibold text-amber counter-value">
-                {new Set(projects?.flatMap((p) => p.techStack ?? [])).size ?? 0}
-              </div>
-              <div className="caption-mono text-muted">Technologies</div>
-            </div>
-            <div className="flat-surface edge-lit rounded-xl p-4 text-center">
-              <div className="text-2xl font-semibold text-amber counter-value">
-                {new Set(projects?.map((p) => p.category)).size ?? 0}
-              </div>
-              <div className="caption-mono text-muted">Domains</div>
-            </div>
+          
+          {/* Category Filter Tabs */}
+          <div className="flex flex-wrap gap-2 mt-6">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 rounded-xl text-xs font-mono font-medium transition-all duration-300 ${
+                  activeCategory === cat
+                    ? 'bg-amber text-[#0a0a0c] font-bold shadow-md shadow-amber/20 glow-gold scale-105'
+                    : 'bg-card border border-border text-foreground/80 hover:border-amber/50'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects?.map((proj) => (
+          {filteredProjects?.map((proj) => (
             <HoloCard key={proj.id} proj={proj} onOpen={() => setSelected(proj)} />
           ))}
         </div>

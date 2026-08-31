@@ -116,7 +116,7 @@ export function PortihelpAI({ portfolioData, isAdminView = false, onNavigate }: 
       );
     });
     push(['skills', 'skill', 'technologies', 'tech', 'stack', 'tools'], 'skills', 'Skills', 'skills');
-    push(['python', 'react', 'react.js', 'node', 'node.js', 'mongo', 'mongodb', 'yolo', 'opencv', 'tensorflow', 'ml', 'machine learning', 'ai', 'deep learning', 'cnn', 'full stack', 'vision', 'nlp', 'ocr', 'git', 'docker', 'javascript', 'express', 'html', 'css'], 'tech', 'Technology', 'skills');
+    push(['python', 'react', 'react.js', 'node', 'node.js', 'mongo', 'mongodb', 'yolo', 'opencv', 'tensorflow', 'ml', 'machine learning', 'ai', 'deep learning', 'cnn', 'full stack', 'vision', 'nlp', 'ocr', 'git', 'javascript', 'express', 'html', 'css'], 'tech', 'Technology', 'skills');
 
     d.projects.forEach((p) =>
       push([p.title, ...p.title.split(' '), ...(p.category.split(' '))], 'project', p.title, 'projects')
@@ -318,8 +318,8 @@ d.experience.forEach((e) =>
     if (q.includes('location') || q.includes('address') || q.includes('where') || q.includes('trichy')) {
       return { reply: 'Jeeva is based in Trichy, Tamil Nadu, India.', type: 'location', label: 'Trichy, Tamil Nadu, India', screen: 'contact' };
     }
-    if (q.includes('github')) {
-      return { reply: portfolioData.profile.github, type: 'github', label: portfolioData.profile.github, screen: 'contact' };
+    if (q.includes('github') || q.includes('repo') || q.includes('commit') || q.includes('git')) {
+      return { reply: 'Opening the live GitHub Developer Matrix — view real-time stats, repos, and language allocations!', type: 'github', label: portfolioData.profile.github, screen: 'github' };
     }
     if (q.includes('linkedin') || q.includes('linked')) {
       return { reply: portfolioData.profile.linkedIn, type: 'linkedin', label: portfolioData.profile.linkedIn, screen: 'contact' };

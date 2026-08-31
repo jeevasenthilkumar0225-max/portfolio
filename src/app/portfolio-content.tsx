@@ -12,6 +12,7 @@ import { Experience } from '@/components/experience';
 import { Projects } from '@/components/projects';
 import { Certifications } from '@/components/certifications';
 import { Contact } from '@/components/contact';
+import { GithubDashboard } from '@/components/github-dashboard';
 import { Dock } from '@/components/dock';
 import { AmbientControls } from '@/components/ambient-controls';
 
@@ -40,7 +41,9 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
       case 'experience':
         return <Experience experiences={data.experience} />;
       case 'projects':
-        return <Projects projects={data.projects} />;
+        return <Projects projects={data.projects} onNavigate={navigate} />;
+      case 'github':
+        return <GithubDashboard githubUrl={data.profile.github} />;
       case 'certificates':
         return <Certifications certifications={data.certifications} />;
       case 'contact':

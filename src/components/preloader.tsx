@@ -83,14 +83,8 @@ setWordCount(0);
   }, [wordCount, quoteWords.length]);
 
   const handleInitialize = () => {
-    setStage('activating');
-    bootStartRef.current = performance.now();
-    setTimeout(() => setStage('core'), 1200);
-    setTimeout(() => setStage('zoom'), 3000);
-    setTimeout(() => {
-      setStage('done');
-      onComplete();
-    }, 5000);
+    setStage('done');
+    onComplete();
   };
 
   // Main canvas: ambient dust + activation burst + core assembly + camera zoom
@@ -336,8 +330,8 @@ setWordCount(0);
   return (
     <motion.div
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: 'easeInOut' }}
+      exit={{ opacity: 0, scale: 1.02, filter: 'blur(8px)' }}
+      transition={{ duration: 0.5, ease: [0.43, 0.13, 0.23, 0.96] }}
       className="fixed inset-0 z-[70] flex items-center justify-center bg-black overflow-hidden"
     >
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />

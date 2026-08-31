@@ -87,6 +87,15 @@ className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border bord
                 <Code2 className="w-4 h-4" /> Projects
               </motion.button>
 
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onNavigate('github')}
+                className="px-6 py-3.5 rounded-xl bg-card border border-border text-foreground font-semibold text-sm flex items-center gap-2 hover:border-[#f4b400]/60 transition-colors"
+              >
+                <GithubIcon className="w-4 h-4 text-amber" /> GitHub Dashboard
+              </motion.button>
+
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -106,27 +115,45 @@ className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border bord
               </motion.button>
             </div>
 
-{/* Social links — minimal */}
-            <div className="flex items-center gap-4 pt-2">
-              <span className="font-mono text-[11px] uppercase tracking-widest text-text-label font-medium">
-                <Sparkles className="inline w-3 h-3 mr-1 text-amber" /> Connect
-              </span>
-              <a
-                href={profile.linkedIn.startsWith('http') ? profile.linkedIn : `https://${profile.linkedIn}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-xl bg-card border border-border text-amber hover:border-[#f4b400] hover:scale-110 transition-transform"
-              >
-                <LinkedinIcon className="w-5 h-5" />
-              </a>
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-xl bg-card border border-border text-amber hover:border-[#f4b400] hover:scale-110 transition-transform"
-              >
-                <GithubIcon className="w-5 h-5" />
-              </a>
+            {/* Social links & live stats */}
+            <div className="space-y-6 pt-2">
+              <div className="flex items-center gap-4">
+                <span className="font-mono text-[11px] uppercase tracking-widest text-text-label font-medium">
+                  <Sparkles className="inline w-3.5 h-3.5 mr-1 text-amber" /> Connect
+                </span>
+                <a
+                  href={profile.linkedIn.startsWith('http') ? profile.linkedIn : `https://${profile.linkedIn}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-card border border-border text-amber hover:border-[#f4b400] hover:scale-110 transition-all shadow-sm"
+                >
+                  <LinkedinIcon className="w-5 h-5" />
+                </a>
+                <a
+                  href={profile.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-card border border-border text-amber hover:border-[#f4b400] hover:scale-110 transition-all shadow-sm"
+                >
+                  <GithubIcon className="w-5 h-5" />
+                </a>
+              </div>
+
+              {/* Stats Highlight Bar */}
+              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/50 max-w-lg">
+                <div className="p-3 rounded-xl bg-card/60 border border-border/60 text-center">
+                  <div className="text-xl font-bold font-mono text-amber">8.03</div>
+                  <div className="text-[11px] text-text-label uppercase tracking-wider font-mono">CGPA (IT)</div>
+                </div>
+                <div className="p-3 rounded-xl bg-card/60 border border-border/60 text-center">
+                  <div className="text-xl font-bold font-mono text-amber">10+</div>
+                  <div className="text-[11px] text-text-label uppercase tracking-wider font-mono">Projects</div>
+                </div>
+                <div className="p-3 rounded-xl bg-card/60 border border-border/60 text-center">
+                  <div className="text-xl font-bold font-mono text-amber">100%</div>
+                  <div className="text-[11px] text-text-label uppercase tracking-wider font-mono">AI Focused</div>
+                </div>
+              </div>
             </div>
           </motion.div>
 
