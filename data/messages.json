@@ -8,7 +8,8 @@
     "createdAt": "Oct 13, 2026, 9:46 PM",
     "timestamp": 1791908208978,
     "isRead": false,
-    "notificationSent": false
+    "notificationSent": false,
+    "_id": "6ace82dd313806bf21180c65"
   },
   {
     "id": "msg-1791908147353-6n257",
@@ -19,7 +20,8 @@
     "createdAt": "Oct 13, 2026, 9:45 PM",
     "timestamp": 1791908147353,
     "isRead": false,
-    "notificationSent": false
+    "notificationSent": false,
+    "_id": "6ace82dd313806bf21180c66"
   },
   {
     "id": "msg-1786091486893-ye16j",
@@ -30,7 +32,8 @@
     "createdAt": "Aug 7, 2026, 2:01 PM",
     "timestamp": 1786091486889,
     "isRead": false,
-    "notificationSent": true
+    "notificationSent": true,
+    "_id": "6ace82dd313806bf21180c67"
   },
   {
     "id": "msg-1786086064008-o876t",
@@ -41,7 +44,8 @@
     "createdAt": "Aug 7, 2026, 12:31 PM",
     "timestamp": 1786086064002,
     "isRead": false,
-    "notificationSent": false
+    "notificationSent": false,
+    "_id": "6ace82dd313806bf21180c68"
   },
   {
     "id": "msg-1786085638354-tttgw",
@@ -52,7 +56,8 @@
     "createdAt": "Aug 7, 2026, 12:23 PM",
     "timestamp": 1786085638351,
     "isRead": false,
-    "notificationSent": false
+    "notificationSent": false,
+    "_id": "6ace82dd313806bf21180c69"
   },
   {
     "id": "msg-1786085211214-twg9r",
@@ -64,7 +69,8 @@
     "timestamp": 1786085211209,
     "isRead": true,
     "notificationSent": false,
-    "read": true
+    "read": true,
+    "_id": "6ace82dd313806bf21180c6a"
   },
   {
     "id": "msg-1786084552198-ib5w6",
@@ -74,7 +80,8 @@
     "message": "jrbjligjhrwq",
     "date": "Aug 7, 2026, 12:05 PM",
     "timestamp": 1786084552198,
-    "read": false
+    "read": false,
+    "_id": "6ace82dd313806bf21180c6b"
   },
   {
     "id": "msg-1786084529040-0komb",
@@ -84,7 +91,8 @@
     "message": "JOHR9UPYp;ufi;ewjfipwj",
     "date": "Aug 7, 2026, 12:05 PM",
     "timestamp": 1786084529061,
-    "read": false
+    "read": false,
+    "_id": "6ace82dd313806bf21180c6c"
   },
   {
     "id": "msg-1786084201972-ahkvx",
@@ -94,7 +102,8 @@
     "message": "jkfbwkjfgidwb.vjobe ligfl",
     "date": "Aug 7, 2026, 12:00 PM",
     "timestamp": 1786084201990,
-    "read": true
+    "read": true,
+    "_id": "6ace82dd313806bf21180c6d"
   },
   {
     "id": "msg-1786083804393-p9pzx",
@@ -104,6 +113,7 @@
     "message": "summa than just tested",
     "date": "Aug 7, 2026, 11:53 AM",
     "timestamp": 1786083804416,
-    "read": true
+    "read": true,
+    "_id": "6ace82dd313806bf21180c6e"
   }
 ]
