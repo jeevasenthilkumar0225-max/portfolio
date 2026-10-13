@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { getDatabase } from './mongodb';
+import { getDatabase, getLastMongoConnectionError } from './mongodb';
 
 const dataFilePath = path.join(process.cwd(), 'data', 'portfolio.json');
 
@@ -18,6 +18,7 @@ let cachedData: PortfolioData | null = null;
 let cachedMtime: number = 0;
 let isStorageReadOnly: boolean = false;
 let isMongoConnected: boolean = false;
+let lastMongoError: string | null = null;
 
 export interface EducationItem {
   id: string;
@@ -118,6 +119,8 @@ export function getStorageStatus(): {
   path: string;
   fallbackActive: boolean;
   mongoConnected: boolean;
+  mongoError: string | null;
+  hasMongoUri: boolean;
 } {
   const fallbackPath = getFallbackFilePath();
   const fallbackExists = fs.existsSync(fallbackPath);
@@ -126,6 +129,8 @@ export function getStorageStatus(): {
     path: isMongoConnected ? 'MongoDB Cloud Atlas (portfolio_main)' : fallbackExists ? fallbackPath : dataFilePath,
     fallbackActive: fallbackExists && !isMongoConnected,
     mongoConnected: isMongoConnected,
+    mongoError: lastMongoError || getLastMongoConnectionError(),
+    hasMongoUri: Boolean(process.env.MONGODB_URI),
   };
 }
 
@@ -227,20 +232,27 @@ export async function savePortfolioData(data: PortfolioData): Promise<boolean> {
   let mongoSaved = false;
 
   // 1. Try saving to MongoDB if configured
-  try {
-    const db = await getDatabase();
-    if (db) {
-      await db.collection('portfolio_data').updateOne(
-        { id: 'main_portfolio' },
-        { $set: { id: 'main_portfolio', data, updatedAt: new Date() } },
-        { upsert: true }
-      );
-      isMongoConnected = true;
-      mongoSaved = true;
-    }
-  } catch (mongoErr) {
-    console.warn('[data.ts] MongoDB write failed:', mongoErr);
+  if (!process.env.MONGODB_URI) {
+    lastMongoError = 'MONGODB_URI environment variable is missing in Vercel settings';
     isMongoConnected = false;
+  } else {
+    try {
+      const db = await getDatabase();
+      if (db) {
+        await db.collection('portfolio_data').updateOne(
+          { id: 'main_portfolio' },
+          { $set: { id: 'main_portfolio', data, updatedAt: new Date() } },
+          { upsert: true }
+        );
+        isMongoConnected = true;
+        mongoSaved = true;
+        lastMongoError = null;
+      }
+    } catch (mongoErr: any) {
+      console.warn('[data.ts] MongoDB write failed:', mongoErr);
+      isMongoConnected = false;
+      lastMongoError = mongoErr?.message || String(mongoErr);
+    }
   }
 
   // 2. Also save to local filesystem / fallback tmp

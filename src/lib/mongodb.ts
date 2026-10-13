@@ -6,11 +6,17 @@ declare global {
 }
 
 let clientPromise: Promise<MongoClient> | null = null;
+let lastConnectionError: string | null = null;
+
+export function getLastMongoConnectionError(): string | null {
+  return lastConnectionError;
+}
 
 export async function getDatabase(dbName = 'portfolio') {
   const uri = process.env.MONGODB_URI;
 
   if (!uri) {
+    lastConnectionError = 'MONGODB_URI environment variable is not defined';
     return null;
   }
 
@@ -32,20 +38,23 @@ export async function getDatabase(dbName = 'portfolio') {
         });
         clientPromise = client.connect();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('[mongodb.ts] Initialization error:', err);
       clientPromise = null;
-      return null;
+      lastConnectionError = err?.message || 'Client initialization failed';
+      throw err;
     }
   }
 
   try {
     const client = await clientPromise;
+    lastConnectionError = null;
     return client.db(dbName);
-  } catch (error) {
+  } catch (error: any) {
     console.error('[mongodb.ts] Connection error:', error);
-    clientPromise = null; // Allow retry on subsequent requests
-    return null;
+    clientPromise = null; // Reset so subsequent requests retry
+    lastConnectionError = error?.message || 'Connection failed';
+    throw error;
   }
 }
 

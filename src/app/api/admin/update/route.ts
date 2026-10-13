@@ -24,13 +24,22 @@ export async function POST(request: Request) {
 
     const status = getStorageStatus();
 
+    let userMessage = 'Portfolio updated and saved successfully';
+    if (status.mongoConnected) {
+      userMessage = 'Portfolio updated and saved permanently to MongoDB Atlas!';
+    } else if (status.readOnly) {
+      if (!status.hasMongoUri) {
+        userMessage = 'Saved in temporary cache: MONGODB_URI is not set in Vercel Environment Variables. Please add it in Vercel Settings to persist permanently.';
+      } else if (status.mongoError) {
+        userMessage = `Saved in temporary cache: MongoDB connection failed (${status.mongoError}).`;
+      } else {
+        userMessage = 'Portfolio updated in runtime memory & temporary cache (Serverless environment detected)';
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      message: status.mongoConnected
-        ? 'Portfolio updated and saved permanently to MongoDB Atlas!'
-        : status.readOnly
-        ? 'Portfolio updated in runtime memory & temporary cache (Serverless environment detected)'
-        : 'Portfolio updated and saved successfully',
+      message: userMessage,
       storageStatus: status,
       data: body,
     });
