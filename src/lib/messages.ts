@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { getDatabase } from './mongodb';
 
 const messagesFilePath = path.join(process.cwd(), 'data', 'messages.json');
 
@@ -46,7 +47,25 @@ function getActiveFilePath(): string {
   return messagesFilePath;
 }
 
-export function getMessages(): ContactMessage[] {
+export async function getMessages(): Promise<ContactMessage[]> {
+  // 1. Try MongoDB if configured
+  try {
+    const db = await getDatabase();
+    if (db) {
+      const docs = await db.collection('contact_messages').find().sort({ timestamp: -1 }).toArray();
+      if (docs && docs.length > 0) {
+        cachedMessages = docs.map((doc) => {
+          const { _id, ...rest } = doc;
+          return rest as ContactMessage;
+        });
+        return cachedMessages;
+      }
+    }
+  } catch (mongoErr) {
+    console.warn('[messages.ts] MongoDB read failed, falling back to local files:', mongoErr);
+  }
+
+  // 2. Fallback to local files
   try {
     const activePath = getActiveFilePath();
 
@@ -66,19 +85,34 @@ export function getMessages(): ContactMessage[] {
     }
 
     return [];
-  } catch (error) {
-    if (cachedMessages !== null) {
-      return cachedMessages;
-    }
-    return [];
+  } catch {
+    return cachedMessages || [];
   }
 }
 
-export function saveMessages(messages: ContactMessage[]): boolean {
+export async function saveMessages(messages: ContactMessage[]): Promise<boolean> {
   cachedMessages = messages;
   lastMtime = Date.now();
 
-  // Try primary location
+  let mongoSaved = false;
+
+  // 1. Try MongoDB
+  try {
+    const db = await getDatabase();
+    if (db) {
+      // Clear and bulk insert or sync
+      const col = db.collection('contact_messages');
+      await col.deleteMany({});
+      if (messages.length > 0) {
+        await col.insertMany(messages);
+      }
+      mongoSaved = true;
+    }
+  } catch (mongoErr) {
+    console.warn('[messages.ts] MongoDB write failed:', mongoErr);
+  }
+
+  // 2. Local filesystem / fallback tmp
   try {
     const dir = path.dirname(messagesFilePath);
     if (!fs.existsSync(dir)) {
@@ -88,7 +122,6 @@ export function saveMessages(messages: ContactMessage[]): boolean {
     lastMtime = fs.statSync(messagesFilePath).mtimeMs;
     return true;
   } catch {
-    // Fallback to /tmp in read-only serverless environment
     try {
       const fallbackPath = getMessagesFallbackPath();
       const dir = path.dirname(fallbackPath);
@@ -99,7 +132,7 @@ export function saveMessages(messages: ContactMessage[]): boolean {
       lastMtime = fs.statSync(fallbackPath).mtimeMs;
       return true;
     } catch {
-      return true; // Memory cache updated
+      return mongoSaved || true;
     }
   }
 }

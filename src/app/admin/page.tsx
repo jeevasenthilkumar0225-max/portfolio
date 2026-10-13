@@ -14,7 +14,7 @@ export default async function AdminPage() {
     redirect('/admin/login');
   }
 
-  const portfolioData = getPortfolioData();
+  const portfolioData = await getPortfolioData();
 
   return <AdminDashboard initialData={portfolioData} />;
 }

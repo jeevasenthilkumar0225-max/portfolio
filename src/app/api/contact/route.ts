@@ -75,9 +75,9 @@ export async function POST(request: Request) {
     };
 
     // 5. Save message first so we NEVER lose user messages
-    const currentMessages = getMessages();
+    const currentMessages = await getMessages();
     currentMessages.unshift(newMessage);
-    saveMessages(currentMessages);
+    await saveMessages(currentMessages);
 
     const pendingCount = currentMessages.filter((m) => !m.isRead && !m.read).length;
 
@@ -100,10 +100,11 @@ export async function POST(request: Request) {
 
     // 7. Update notificationSent flag if sent successfully
     if (emailSent) {
-      const messagesWithSentFlag = getMessages().map((m) =>
+      const allMsgs = await getMessages();
+      const messagesWithSentFlag = allMsgs.map((m: ContactMessage) =>
         m.id === messageId ? { ...m, notificationSent: true } : m
       );
-      saveMessages(messagesWithSentFlag);
+      await saveMessages(messagesWithSentFlag);
     }
 
     return NextResponse.json({

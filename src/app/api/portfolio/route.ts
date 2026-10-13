@@ -3,7 +3,7 @@ import { getPortfolioData } from '@/lib/data';
 
 export async function GET() {
   try {
-    const data = getPortfolioData();
+    const data = await getPortfolioData();
     const response = NextResponse.json(data);
     response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
     return response;

@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Invalid portfolio data payload' }, { status: 400 });
     }
 
-    const saved = savePortfolioData(body);
+    const saved = await savePortfolioData(body);
     if (!saved) {
       return NextResponse.json({ success: false, error: 'Failed to write data to storage' }, { status: 500 });
     }
@@ -26,7 +26,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: status.readOnly
+      message: status.mongoConnected
+        ? 'Portfolio updated and saved permanently to MongoDB Atlas!'
+        : status.readOnly
         ? 'Portfolio updated in runtime memory & temporary cache (Serverless environment detected)'
         : 'Portfolio updated and saved successfully',
       storageStatus: status,

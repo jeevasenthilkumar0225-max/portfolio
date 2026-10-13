@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ success: false, error: 'Unauthorized: Admin session required' }, { status: 401 });
     }
 
-    const messages = getMessages();
+    const messages = await getMessages();
     return NextResponse.json({ success: true, messages });
   } catch (error) {
     return NextResponse.json({ success: false, error: 'Failed to fetch messages' }, { status: 500 });
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { action, id } = body || {};
 
-    let messages = getMessages();
+    let messages = await getMessages();
 
     if (action === 'delete') {
       messages = messages.filter((m: ContactMessage) => m.id !== id);
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       messages = messages.map((m: ContactMessage) => ({ ...m, isRead: true, read: true }));
     }
 
-    saveMessages(messages);
+    await saveMessages(messages);
     return NextResponse.json({ success: true, messages });
   } catch (error) {
     return NextResponse.json({ success: false, error: 'Failed to update messages' }, { status: 500 });

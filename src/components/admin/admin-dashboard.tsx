@@ -154,7 +154,27 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
     }
   };
 
-  // Save all modifications via API
+  // Sync modifications immediately to server / database
+  const syncToServer = async (payload: PortfolioData, successMsg: string) => {
+    try {
+      const res = await fetch('/api/admin/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await res.json();
+      if (res.ok && resData.success) {
+        showToast(successMsg, 'success');
+      } else {
+        showToast(resData.error || 'Failed to sync with server', 'error');
+      }
+    } catch {
+      showToast('Network error syncing with server', 'error');
+    }
+  };
+
+  // Save all modifications via API (Manual Save & Publish button)
   const handleSaveAll = async () => {
     setSaving(true);
     try {
@@ -206,9 +226,9 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         return;
       }
       setData(parsed);
+      syncToServer(parsed, 'Successfully imported & saved portfolio data!');
       setImportModalOpen(false);
       setImportJsonText('');
-      showToast('Successfully imported portfolio data! Remember to click Save & Publish All.');
     } catch {
       showToast('Invalid JSON syntax: Please check for formatting errors', 'error');
     }
@@ -225,23 +245,23 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
       return;
     }
 
+    let updatedProjects: ProjectItem[];
     if (isNewProject) {
-      setData((prev) => ({ ...prev, projects: [editingProject, ...prev.projects] }));
-      showToast(`Added project: ${editingProject.title}`);
+      updatedProjects = [editingProject, ...data.projects];
     } else {
-      setData((prev) => ({
-        ...prev,
-        projects: prev.projects.map((p) => (p.id === editingProject.id ? editingProject : p)),
-      }));
-      showToast(`Updated project: ${editingProject.title}`);
+      updatedProjects = data.projects.map((p) => (p.id === editingProject.id ? editingProject : p));
     }
+    const updatedData = { ...data, projects: updatedProjects };
+    setData(updatedData);
+    syncToServer(updatedData, isNewProject ? `Added & saved project: ${editingProject.title}` : `Updated & saved project: ${editingProject.title}`);
     setEditingProject(null);
   };
 
   const handleDeleteProject = (id: string, title: string) => {
     if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      setData((prev) => ({ ...prev, projects: prev.projects.filter((p) => p.id !== id) }));
-      showToast(`Deleted project: ${title}`);
+      const updatedData = { ...data, projects: data.projects.filter((p) => p.id !== id) };
+      setData(updatedData);
+      syncToServer(updatedData, `Deleted project: "${title}"`);
     }
   };
 
@@ -256,23 +276,23 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
       return;
     }
 
+    let updatedExp: ExperienceItem[];
     if (isNewExp) {
-      setData((prev) => ({ ...prev, experience: [editingExp, ...prev.experience] }));
-      showToast(`Added experience: ${editingExp.role}`);
+      updatedExp = [editingExp, ...data.experience];
     } else {
-      setData((prev) => ({
-        ...prev,
-        experience: prev.experience.map((e) => (e.id === editingExp.id ? editingExp : e)),
-      }));
-      showToast(`Updated experience: ${editingExp.role}`);
+      updatedExp = data.experience.map((exp) => (exp.id === editingExp.id ? editingExp : exp));
     }
+    const updatedData = { ...data, experience: updatedExp };
+    setData(updatedData);
+    syncToServer(updatedData, isNewExp ? `Added & saved experience: ${editingExp.role}` : `Updated & saved experience: ${editingExp.role}`);
     setEditingExp(null);
   };
 
   const handleDeleteExp = (id: string, role: string) => {
     if (confirm(`Are you sure you want to delete experience "${role}"?`)) {
-      setData((prev) => ({ ...prev, experience: prev.experience.filter((e) => e.id !== id) }));
-      showToast(`Deleted experience record`);
+      const updatedData = { ...data, experience: data.experience.filter((e) => e.id !== id) };
+      setData(updatedData);
+      syncToServer(updatedData, `Deleted experience record: "${role}"`);
     }
   };
 
@@ -288,23 +308,25 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
     }
 
     const currentEduList = data.profile.education || [];
+    let updatedEdu: EducationItem[];
     if (isNewEdu) {
-      const updated = [editingEdu, ...currentEduList];
-      setData((prev) => ({ ...prev, profile: { ...prev.profile, education: updated } }));
-      showToast(`Added education: ${editingEdu.degree}`);
+      updatedEdu = [editingEdu, ...currentEduList];
     } else {
-      const updated = currentEduList.map((ed) => (ed.id === editingEdu.id ? editingEdu : ed));
-      setData((prev) => ({ ...prev, profile: { ...prev.profile, education: updated } }));
-      showToast(`Updated education: ${editingEdu.degree}`);
+      updatedEdu = currentEduList.map((ed) => (ed.id === editingEdu.id ? editingEdu : ed));
     }
+    const updatedData = { ...data, profile: { ...data.profile, education: updatedEdu } };
+    setData(updatedData);
+    syncToServer(updatedData, isNewEdu ? `Added & saved education: ${editingEdu.degree}` : `Updated & saved education: ${editingEdu.degree}`);
     setEditingEdu(null);
   };
 
   const handleDeleteEdu = (id: string, degree: string) => {
     if (confirm(`Are you sure you want to delete education "${degree}"?`)) {
-      const updated = (data.profile.education || []).filter((ed) => ed.id !== id);
-      setData((prev) => ({ ...prev, profile: { ...prev.profile, education: updated } }));
-      showToast('Deleted education record');
+      const currentEduList = data.profile.education || [];
+      const updatedEdu = currentEduList.filter((ed) => ed.id !== id);
+      const updatedData = { ...data, profile: { ...data.profile, education: updatedEdu } };
+      setData(updatedData);
+      syncToServer(updatedData, `Deleted education: "${degree}"`);
     }
   };
 
@@ -319,23 +341,24 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
       return;
     }
 
+    let updatedCerts: CertificationItem[];
     if (isNewCert) {
-      setData((prev) => ({ ...prev, certifications: [editingCert, ...prev.certifications] }));
-      showToast(`Added certification: ${editingCert.title}`);
+      updatedCerts = [editingCert, ...data.certifications];
     } else {
-      setData((prev) => ({
-        ...prev,
-        certifications: prev.certifications.map((c) => (c.id === editingCert.id ? editingCert : c)),
-      }));
-      showToast(`Updated certification: ${editingCert.title}`);
+      updatedCerts = data.certifications.map((c) => (c.id === editingCert.id ? editingCert : c));
     }
+    const updatedData = { ...data, certifications: updatedCerts };
+    setData(updatedData);
+    syncToServer(updatedData, isNewCert ? `Added & saved certification: ${editingCert.title}` : `Updated & saved certification: ${editingCert.title}`);
     setEditingCert(null);
   };
 
   const handleDeleteCert = (id: string, title: string) => {
     if (confirm(`Are you sure you want to delete certification "${title}"?`)) {
-      setData((prev) => ({ ...prev, certifications: prev.certifications.filter((c) => c.id !== id) }));
-      showToast(`Deleted certification`);
+      const updatedCerts = data.certifications.filter((c) => c.id !== id);
+      const updatedData = { ...data, certifications: updatedCerts };
+      setData(updatedData);
+      syncToServer(updatedData, `Deleted certification: "${title}"`);
     }
   };
 
@@ -346,7 +369,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
     e.preventDefault();
     if (!newSkillName.trim() || !targetCategory) return;
 
-    const updated = data.skills.map((cat) => {
+    const updatedSkills = data.skills.map((cat) => {
       if (cat.category === targetCategory) {
         return {
           ...cat,
@@ -356,14 +379,15 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
       return cat;
     });
 
-    setData((prev) => ({ ...prev, skills: updated }));
-    showToast(`Added "${newSkillName.trim()}" to ${targetCategory}`);
+    const updatedData = { ...data, skills: updatedSkills };
+    setData(updatedData);
+    syncToServer(updatedData, `Added "${newSkillName.trim()}" to ${targetCategory}`);
     setNewSkillName('');
     setSkillModalOpen(false);
   };
 
   const handleDeleteSkill = (categoryName: string, skillName: string) => {
-    const updated = data.skills.map((cat) => {
+    const updatedSkills = data.skills.map((cat) => {
       if (cat.category === categoryName) {
         return {
           ...cat,
@@ -372,8 +396,9 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
       }
       return cat;
     });
-    setData((prev) => ({ ...prev, skills: updated }));
-    showToast(`Removed "${skillName}"`);
+    const updatedData = { ...data, skills: updatedSkills };
+    setData(updatedData);
+    syncToServer(updatedData, `Removed skill: "${skillName}"`);
   };
 
   const handleAddCategory = (e: React.FormEvent) => {
@@ -385,18 +410,20 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
       return;
     }
 
-    const updated = [...data.skills, { category: newCategoryName.trim(), items: [] }];
-    setData((prev) => ({ ...prev, skills: updated }));
-    showToast(`Created category: ${newCategoryName.trim()}`);
+    const updatedSkills = [...data.skills, { category: newCategoryName.trim(), items: [] }];
+    const updatedData = { ...data, skills: updatedSkills };
+    setData(updatedData);
+    syncToServer(updatedData, `Created category: ${newCategoryName.trim()}`);
     setNewCategoryName('');
     setCategoryModalOpen(false);
   };
 
   const handleDeleteCategory = (categoryName: string) => {
     if (confirm(`Are you sure you want to delete the category "${categoryName}" and all its skills?`)) {
-      const updated = data.skills.filter((c) => c.category !== categoryName);
-      setData((prev) => ({ ...prev, skills: updated }));
-      showToast(`Deleted category "${categoryName}"`);
+      const updatedSkills = data.skills.filter((c) => c.category !== categoryName);
+      const updatedData = { ...data, skills: updatedSkills };
+      setData(updatedData);
+      syncToServer(updatedData, `Deleted category: "${categoryName}"`);
     }
   };
 

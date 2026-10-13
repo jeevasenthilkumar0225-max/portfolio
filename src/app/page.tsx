@@ -3,8 +3,8 @@ import { PortfolioContent } from "./portfolio-content";
 
 export const dynamic = "force-dynamic";
 
-export default function Home() {
-  const data = getPortfolioData();
+export default async function Home() {
+  const data = await getPortfolioData();
 
   return <PortfolioContent data={data} />;
 }

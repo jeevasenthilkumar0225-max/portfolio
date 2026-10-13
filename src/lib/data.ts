@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { getDatabase } from './mongodb';
 
 const dataFilePath = path.join(process.cwd(), 'data', 'portfolio.json');
 
@@ -16,6 +17,7 @@ function getFallbackFilePath(): string {
 let cachedData: PortfolioData | null = null;
 let cachedMtime: number = 0;
 let isStorageReadOnly: boolean = false;
+let isMongoConnected: boolean = false;
 
 export interface EducationItem {
   id: string;
@@ -111,21 +113,73 @@ export interface PortfolioData {
   certifications: CertificationItem[];
 }
 
-export function getStorageStatus(): { readOnly: boolean; path: string; fallbackActive: boolean } {
+export function getStorageStatus(): {
+  readOnly: boolean;
+  path: string;
+  fallbackActive: boolean;
+  mongoConnected: boolean;
+} {
   const fallbackPath = getFallbackFilePath();
   const fallbackExists = fs.existsSync(fallbackPath);
   return {
     readOnly: isStorageReadOnly,
-    path: fallbackExists ? fallbackPath : dataFilePath,
-    fallbackActive: fallbackExists,
+    path: isMongoConnected ? 'MongoDB Cloud Atlas (portfolio_main)' : fallbackExists ? fallbackPath : dataFilePath,
+    fallbackActive: fallbackExists && !isMongoConnected,
+    mongoConnected: isMongoConnected,
   };
 }
 
-export function getPortfolioData(): PortfolioData {
+// Read local JSON file as backup or initial seed
+function getLocalSeedData(): PortfolioData {
+  const fallbackPath = getFallbackFilePath();
+  if (fs.existsSync(fallbackPath)) {
+    try {
+      const raw = fs.readFileSync(fallbackPath, 'utf8');
+      return JSON.parse(raw);
+    } catch {
+      // ignore
+    }
+  }
+  if (fs.existsSync(dataFilePath)) {
+    const raw = fs.readFileSync(dataFilePath, 'utf8');
+    return JSON.parse(raw);
+  }
+  if (cachedData) return cachedData;
+  throw new Error(`Data file not found at ${dataFilePath}`);
+}
+
+export async function getPortfolioData(): Promise<PortfolioData> {
+  // 1. Try MongoDB if configured
+  try {
+    const db = await getDatabase();
+    if (db) {
+      const doc = await db.collection('portfolio_data').findOne({ id: 'main_portfolio' });
+      if (doc && doc.data) {
+        isMongoConnected = true;
+        cachedData = doc.data as PortfolioData;
+        return cachedData;
+      }
+
+      // If MongoDB is connected but has no document yet, seed it from local JSON!
+      const seed = getLocalSeedData();
+      await db.collection('portfolio_data').updateOne(
+        { id: 'main_portfolio' },
+        { $set: { id: 'main_portfolio', data: seed, updatedAt: new Date() } },
+        { upsert: true }
+      );
+      isMongoConnected = true;
+      cachedData = seed;
+      return cachedData;
+    }
+  } catch (mongoErr) {
+    console.warn('[data.ts] MongoDB read failed, falling back to local storage:', mongoErr);
+    isMongoConnected = false;
+  }
+
+  // 2. Fallback to local filesystem / /tmp cache
   try {
     const fallbackPath = getFallbackFilePath();
 
-    // Check if fallback tmp file exists and has newer or active data
     if (fs.existsSync(fallbackPath)) {
       try {
         const fallbackStat = fs.statSync(fallbackPath);
@@ -137,7 +191,7 @@ export function getPortfolioData(): PortfolioData {
         cachedMtime = fallbackStat.mtimeMs;
         return cachedData!;
       } catch {
-        // If reading fallback fails, proceed to primary file
+        // proceed
       }
     }
 
@@ -149,7 +203,6 @@ export function getPortfolioData(): PortfolioData {
     const stat = fs.statSync(dataFilePath);
     const mtime = stat.mtimeMs;
 
-    // Fast-path: return cached JSON in-memory if file has not changed
     if (cachedData && cachedMtime === mtime) {
       return cachedData;
     }
@@ -167,12 +220,30 @@ export function getPortfolioData(): PortfolioData {
   }
 }
 
-export function savePortfolioData(data: PortfolioData): boolean {
-  // Update in-memory cache immediately so runtime requests have instant access
+export async function savePortfolioData(data: PortfolioData): Promise<boolean> {
   cachedData = data;
   cachedMtime = Date.now();
 
-  // Try saving to primary dataFilePath (works in local dev & writable servers)
+  let mongoSaved = false;
+
+  // 1. Try saving to MongoDB if configured
+  try {
+    const db = await getDatabase();
+    if (db) {
+      await db.collection('portfolio_data').updateOne(
+        { id: 'main_portfolio' },
+        { $set: { id: 'main_portfolio', data, updatedAt: new Date() } },
+        { upsert: true }
+      );
+      isMongoConnected = true;
+      mongoSaved = true;
+    }
+  } catch (mongoErr) {
+    console.warn('[data.ts] MongoDB write failed:', mongoErr);
+    isMongoConnected = false;
+  }
+
+  // 2. Also save to local filesystem / fallback tmp
   try {
     const dir = path.dirname(dataFilePath);
     if (!fs.existsSync(dir)) {
@@ -183,9 +254,6 @@ export function savePortfolioData(data: PortfolioData): boolean {
     isStorageReadOnly = false;
     return true;
   } catch (fsError: any) {
-    // Vercel serverless functions have a read-only filesystem (/var/task)
-    // EROFS or EACCES: Gracefully fallback to writable temporary storage (/tmp or os.tmpdir)
-    console.warn(`[data.ts] Primary filesystem is read-only (${fsError?.code || fsError?.message}). Writing to temporary fallback storage.`);
     isStorageReadOnly = true;
 
     try {
@@ -197,26 +265,24 @@ export function savePortfolioData(data: PortfolioData): boolean {
       fs.writeFileSync(fallbackPath, JSON.stringify(data, null, 2), 'utf8');
       cachedMtime = fs.statSync(fallbackPath).mtimeMs;
       return true;
-    } catch (fallbackError) {
-      console.error('[data.ts] Fallback storage write also failed:', fallbackError);
-      // In-memory cache is still updated, so return true to prevent client crash
-      return true;
+    } catch {
+      // If MongoDB succeeded, we consider it a success even if local disk fails
+      return mongoSaved;
     }
   }
 }
 
-export function exportPortfolioDataJSON(data?: PortfolioData): string {
-  const target = data || getPortfolioData();
-  return JSON.stringify(target, null, 2);
+export function exportPortfolioDataJSON(data: PortfolioData): string {
+  return JSON.stringify(data, null, 2);
 }
 
-export function importPortfolioDataJSON(jsonString: string): { success: boolean; data?: PortfolioData; error?: string } {
+export async function importPortfolioDataJSON(jsonString: string): Promise<{ success: boolean; data?: PortfolioData; error?: string }> {
   try {
     const parsed = JSON.parse(jsonString);
     if (!parsed || !parsed.profile || !parsed.skills || !parsed.projects || !parsed.experience) {
       return { success: false, error: 'JSON does not conform to PortfolioData schema (missing required fields)' };
     }
-    const saved = savePortfolioData(parsed);
+    const saved = await savePortfolioData(parsed);
     if (!saved) {
       return { success: false, error: 'Failed to write imported data to storage' };
     }
