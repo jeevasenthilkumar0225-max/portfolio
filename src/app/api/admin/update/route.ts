@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { savePortfolioData } from '@/lib/data';
+import { savePortfolioData, getStorageStatus } from '@/lib/data';
 
 export async function POST(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
     // Check auth cookie
     if (!token || token !== 'js-portfolio-authenticated-admin-session') {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin session required' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -19,12 +19,21 @@ export async function POST(request: Request) {
 
     const saved = savePortfolioData(body);
     if (!saved) {
-      return NextResponse.json({ success: false, error: 'Failed to write data to disk' }, { status: 500 });
+      return NextResponse.json({ success: false, error: 'Failed to write data to storage' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: 'Portfolio updated successfully', data: body });
+    const status = getStorageStatus();
+
+    return NextResponse.json({
+      success: true,
+      message: status.readOnly
+        ? 'Portfolio updated in runtime memory & temporary cache (Serverless environment detected)'
+        : 'Portfolio updated and saved successfully',
+      storageStatus: status,
+      data: body,
+    });
   } catch (error) {
+    console.error('[POST /api/admin/update] Error:', error);
     return NextResponse.json({ success: false, error: 'Server error saving data' }, { status: 500 });
   }
 }
-

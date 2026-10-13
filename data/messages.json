@@ -1,5 +1,27 @@
 [
   {
+    "id": "msg-1791908208978-h2tux",
+    "name": "Automated QA Agent",
+    "email": "test-1791908208960@domain.com",
+    "subject": "Test Inbound Inquiry",
+    "message": "Hello Jeeva, this is an automated test message for verifying contact flow.",
+    "createdAt": "Oct 13, 2026, 9:46 PM",
+    "timestamp": 1791908208978,
+    "isRead": false,
+    "notificationSent": false
+  },
+  {
+    "id": "msg-1791908147353-6n257",
+    "name": "Automated QA Agent",
+    "email": "test-1791908147324@domain.com",
+    "subject": "Test Inbound Inquiry",
+    "message": "Hello Jeeva, this is an automated test message for verifying contact flow.",
+    "createdAt": "Oct 13, 2026, 9:45 PM",
+    "timestamp": 1791908147353,
+    "isRead": false,
+    "notificationSent": false
+  },
+  {
     "id": "msg-1786091486893-ye16j",
     "name": "jeeeva",
     "email": "jeevasenthilkumar0225@gmail.com",

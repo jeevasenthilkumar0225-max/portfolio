@@ -63,7 +63,7 @@ export function Hero({ profile }: HeroProps) {
             {/* Name Heading */}
             <div className="space-y-2">
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-black dark:text-white">
-                Hi, I'm{' '}
+                Hi, I&apos;m{' '}
                 <span className="gold-text-gradient block sm:inline">
                   {profile.name || 'Jeeva SenthilKumar'}
                 </span>
@@ -93,7 +93,7 @@ export function Hero({ profile }: HeroProps) {
             {/* AI Motivational Quote */}
             <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs font-mono font-bold text-amber-950 dark:text-amber-300 flex items-center gap-2 max-w-xl">
               <Cpu className="w-4 h-4 text-amber-800 dark:text-amber-400 shrink-0 animate-pulse" />
-              <span>"Building intelligent neural models & vision systems to transform accessibility and software automation."</span>
+              <span>&ldquo;Building intelligent neural models & vision systems to transform accessibility and software automation.&rdquo;</span>
             </div>
 
             {/* CTAs */}

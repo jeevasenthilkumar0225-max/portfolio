@@ -1,52 +1,9 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 import { NotificationService } from '@/lib/notification-service';
+import { getMessages, saveMessages, ContactMessage } from '@/lib/messages';
 
-const messagesFilePath = path.join(process.cwd(), 'data', 'messages.json');
-
-// Simple in-memory rate-limiter map tracking IP/timestamp
+// In-memory rate-limiter map tracking IP/timestamp
 const rateLimitMap = new Map<string, number>();
-
-export interface ContactMessage {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  createdAt: string;
-  timestamp: number;
-  isRead: boolean;
-  notificationSent: boolean;
-}
-
-function getMessages(): ContactMessage[] {
-  try {
-    if (!fs.existsSync(messagesFilePath)) {
-      fs.writeFileSync(messagesFilePath, '[]', 'utf8');
-      return [];
-    }
-    const fileContents = fs.readFileSync(messagesFilePath, 'utf8');
-    return JSON.parse(fileContents);
-  } catch (error) {
-    console.error('Error reading messages database:', error);
-    return [];
-  }
-}
-
-function saveMessages(messages: ContactMessage[]): boolean {
-  try {
-    const dir = path.dirname(messagesFilePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2), 'utf8');
-    return true;
-  } catch (error) {
-    console.error('Error saving messages database:', error);
-    return false;
-  }
-}
 
 // Simple input sanitization helper
 function sanitize(input: string): string {
@@ -62,34 +19,36 @@ function sanitize(input: string): string {
 
 export async function POST(request: Request) {
   try {
-    // 1. Spam Honeypot & Rate-limiting Check
+    const body = await request.json();
+    const { name, email, subject, message, honeypot } = body || {};
+
+    // 1. Honeypot spam bot check
+    if (honeypot) {
+      return NextResponse.json({ success: false, error: 'Spam detected' }, { status: 400 });
+    }
+
+    // 2. Missing required fields check
+    if (!name || !email || !message) {
+      return NextResponse.json({ success: false, error: 'Missing required contact fields' }, { status: 400 });
+    }
+
+    // 3. Rate-limiting Check on valid submissions (prevents spam flooding)
     const ip = request.headers.get('x-forwarded-for') || 'anonymous';
     const now = Date.now();
-    
+    const cooldownMs = process.env.NODE_ENV === 'production' ? 10000 : 500;
+
     if (rateLimitMap.has(ip)) {
       const lastSubmission = rateLimitMap.get(ip)!;
-      if (now - lastSubmission < 10000) { // 10-second cool down to prevent spam attacks
+      if (now - lastSubmission < cooldownMs) {
         return NextResponse.json(
-          { success: false, error: 'Too many requests. Please wait 10 seconds before sending another message.' },
+          { success: false, error: 'Too many requests. Please wait a few moments before sending another message.' },
           { status: 429 }
         );
       }
     }
     rateLimitMap.set(ip, now);
 
-    const body = await request.json();
-    const { name, email, subject, message, honeypot } = body;
-
-    // Honeypot spam bot check
-    if (honeypot) {
-      return NextResponse.json({ success: false, error: 'Spam detected' }, { status: 400 });
-    }
-
-    if (!name || !email || !message) {
-      return NextResponse.json({ success: false, error: 'Missing required contact fields' }, { status: 400 });
-    }
-
-    // 2. Sanitize and validate inputs
+    // 4. Sanitize and validate inputs
     const cleanName = sanitize(name);
     const cleanEmail = sanitize(email);
     const cleanSubject = sanitize(subject || 'No Subject');
@@ -108,19 +67,21 @@ export async function POST(request: Request) {
       subject: cleanSubject,
       message: cleanMessage,
       createdAt: createdAtString,
+      date: createdAtString,
       timestamp: now,
       isRead: false,
+      read: false,
       notificationSent: false,
     };
 
-    // 3. Save message first so we NEVER lose user messages
+    // 5. Save message first so we NEVER lose user messages
     const currentMessages = getMessages();
     currentMessages.unshift(newMessage);
     saveMessages(currentMessages);
 
-    const pendingCount = currentMessages.filter((m) => !m.isRead).length;
+    const pendingCount = currentMessages.filter((m) => !m.isRead && !m.read).length;
 
-    // 4. Dispatch Email Notification Alert
+    // 6. Dispatch Email Notification Alert
     let emailSent = false;
     try {
       emailSent = await NotificationService.sendAllAlerts({
@@ -137,7 +98,7 @@ export async function POST(request: Request) {
       console.error('[POST /api/contact] Error during notification dispatch:', sendErr);
     }
 
-    // 5. Update notificationSent flag if sent successfully
+    // 7. Update notificationSent flag if sent successfully
     if (emailSent) {
       const messagesWithSentFlag = getMessages().map((m) =>
         m.id === messageId ? { ...m, notificationSent: true } : m

@@ -75,9 +75,8 @@ export function PortihelpAI({ portfolioData, isAdminView = false, onNavigate }: 
   const [loading, setLoading] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [listening, setListening] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestIndex, setSuggestIndex] = useState(-1);
-  const [history, setHistory] = useState<string[]>([]);
+  const [dismissedSuggestions, setDismissedSuggestions] = useState(false);
   const recognitionRef = useRef<any>(null);
 
   const [messages, setMessages] = useState<Message[]>([
@@ -152,18 +151,14 @@ d.experience.forEach((e) =>
     return terms;
   }, [portfolioData]);
 
-  // ---------- Autocomplete suggestions ----------
-  useEffect(() => {
+  // ---------- Autocomplete suggestions (pure derivation via useMemo) ----------
+  const suggestions = useMemo(() => {
+    if (dismissedSuggestions) return [];
     const q = input.trim();
-    if (!q || q.length < 1) {
-      setSuggestions([]);
-      setSuggestIndex(-1);
-      return;
-    }
+    if (!q || q.length < 1) return [];
     const matches = fuzzyMatch(q, Array.from(new Set(index.map((t) => t.label))).slice(0, 60));
-    setSuggestions(matches.slice(0, 5));
-    setSuggestIndex(-1);
-  }, [input, index]);
+    return matches.slice(0, 5);
+  }, [input, index, dismissedSuggestions]);
 
   useEffect(() => {
     if (isOpen) {
@@ -409,43 +404,51 @@ d.experience.forEach((e) =>
   };
 
   // ---------- Send handler ----------
-  const handleSendMessage = async (textToSend?: string, keepOpen = true) => {
+  const handleSendMessage = async (textToSend?: string) => {
     const query = textToSend || input;
     if (!query.trim()) return;
 
     const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const userMsg: Message = { id: Date.now().toString(), sender: 'user', text: query, timestamp: currentTime };
+    const userMsg: Message = { id: `user-${Date.now()}`, sender: 'user', text: query, timestamp: currentTime };
     setMessages((prev) => [...prev, userMsg]);
-    setHistory((prev) => [query, ...prev.filter((h) => h !== query)].slice(0, 8));
     if (!textToSend) setInput('');
-    setSuggestions([]);
     setSuggestIndex(-1);
     setLoading(true);
 
     const cleanQuery = query.trim();
 
-    // Silent secret code
-    if (cleanQuery === 'jeeva0225' || cleanQuery.toLowerCase() === 'jeeva0225') {
+    // Silent secret code check via server endpoint (prevents hardcoded secret in client bundle)
+    if (cleanQuery.length >= 6 && !cleanQuery.includes(' ')) {
       try {
         const res = await fetch('/api/admin/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ secretCode: 'jeeva0225' }),
+          body: JSON.stringify({ secretCode: cleanQuery }),
         });
         const authData = await res.json();
         if (res.ok && authData.success) {
-          const secretMsg: Message = { id: (Date.now() + 1).toString(), sender: 'ai', text: '🔑 Access Granted! Redirecting to Admin Dashboard...', timestamp: currentTime, isSecretResponse: true };
+          const secretMsg: Message = {
+            id: `ai-${Date.now()}`,
+            sender: 'ai',
+            text: '🔑 Access Granted! Redirecting to Admin Dashboard...',
+            timestamp: currentTime,
+            isSecretResponse: true,
+          };
           setMessages((prev) => [...prev, secretMsg]);
           setLoading(false);
-          setTimeout(() => { router.push('/admin'); router.refresh(); }, 1000);
+          setTimeout(() => {
+            window.location.href = '/admin';
+          }, 800);
           return;
         }
-      } catch (err) { console.error(err); }
+      } catch {
+        // Continue to standard intent resolution
+      }
     }
 
     // Resolve intent
     const resolved = resolveIntent(cleanQuery);
-    const aiId = (Date.now() + 1).toString();
+    const aiId = `ai-${Date.now()}`;
 
     if (resolved) {
       const properReply = resolved.type === 'skill' && resolved.screen === 'skills'
@@ -478,7 +481,7 @@ d.experience.forEach((e) =>
     }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      const aiId = (Date.now() + 1).toString();
+      const aiId = `ai-${Date.now()}`;
       const msg = 'Voice input is not supported in this browser. Try Chrome or Edge.';
       setMessages((prev) => [...prev, { id: aiId, sender: 'ai', text: msg, timestamp: 'Just now' }]);
       return;
@@ -605,7 +608,12 @@ d.experience.forEach((e) =>
                 {suggestions.map((s, i) => (
                   <button
                     key={s}
-                    onMouseDown={(e) => { e.preventDefault(); setInput(s); setSuggestions([]); }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setInput(s);
+                      setDismissedSuggestions(true);
+                      handleSendMessage(s);
+                    }}
                     className={`w-full text-left px-3 py-2 text-xs font-mono flex items-center gap-2 ${i === suggestIndex ? 'bg-amber-500/20 text-amber' : 'text-zinc-200 hover:bg-zinc-800'}`}
                   >
                     <Sparkles className="w-3 h-3 text-amber" /> {s}
@@ -627,12 +635,17 @@ d.experience.forEach((e) =>
                 type="text"
                 placeholder={listening ? 'Listening...' : 'Ask portihelp AI anything...'}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  setDismissedSuggestions(false);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && suggestions.length > 0 && suggestIndex >= 0) {
                     setInput(suggestions[suggestIndex]);
+                    setDismissedSuggestions(true);
                     handleSendMessage(suggestions[suggestIndex]);
                   } else if (e.key === 'Enter') {
+                    setDismissedSuggestions(true);
                     handleSendMessage();
                   } else if (e.key === 'ArrowDown') {
                     e.preventDefault();
@@ -641,7 +654,7 @@ d.experience.forEach((e) =>
                     e.preventDefault();
                     setSuggestIndex((i) => Math.max(i - 1, 0));
                   } else if (e.key === 'Escape') {
-                    setSuggestions([]);
+                    setDismissedSuggestions(true);
                     setSuggestIndex(-1);
                   }
                 }}

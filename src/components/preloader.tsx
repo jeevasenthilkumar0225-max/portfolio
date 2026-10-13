@@ -58,7 +58,6 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
 
   // Word-by-word quote reveal (fast, 30ms/word)
   useEffect(() => {
-setWordCount(0);
     const interval = setInterval(() => {
       setWordCount((c) => {
         if (c >= quoteWords.length) {

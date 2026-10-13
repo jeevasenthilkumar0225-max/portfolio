@@ -23,9 +23,8 @@ export function GoldenCursorSpark() {
     if (!ctx) return;
 
     let animationFrameId: number;
-    let particles: Particle[] = [];
+    const particles: Particle[] = [];
     let isMouseDown = false;
-    let lastTime = 0;
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;

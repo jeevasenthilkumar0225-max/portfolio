@@ -235,6 +235,20 @@
   ],
   "projects": [
     {
+      "id": "proj-1791908420222",
+      "title": "Browser E2E Assistive Vision",
+      "category": "AI / Vision",
+      "techStack": [
+        "PythonOpenCVYOLOv8"
+      ],
+      "description": "E2E verified project description",
+      "longDescription": "",
+      "githubUrl": "https://github.com/jeevasenthilkumar0225-max",
+      "liveUrl": "",
+      "imageUrl": "",
+      "featured": true
+    },
+    {
       "id": "proj-1",
       "title": "Smart Mobility Wheelchair using AI Vision",
       "category": "AI / Vision",

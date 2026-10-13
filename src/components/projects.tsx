@@ -63,6 +63,19 @@ function HoloCard({ proj, onOpen }: { proj: ProjectItem; onOpen: () => void }) {
             )}
           </div>
 
+          {proj.imageUrl && (
+            <div className="h-32 rounded-xl overflow-hidden bg-card-soft border border-[#f4b400]/15 mb-2">
+              <img
+                src={proj.imageUrl}
+                alt={proj.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+
           <h3 className="text-xl font-semibold text-foreground group-hover:text-amber transition-colors">
             {proj.title}
           </h3>
@@ -226,6 +239,20 @@ export function Projects({ projects, onNavigate }: ProjectsProps) {
               <span className="px-3 py-1 rounded-lg bg-[#f4b400]/10 border border-[#f4b400]/25 text-amber font-mono font-medium text-xs uppercase">
                 {selected.category}
               </span>
+
+              {selected.imageUrl && (
+                <div className="h-44 rounded-2xl overflow-hidden bg-card-soft border border-[#f4b400]/20">
+                  <img
+                    src={selected.imageUrl}
+                    alt={selected.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+
               <h3 className="text-2xl font-semibold text-foreground">{selected.title}</h3>
               <p className="text-xs text-foreground/80 font-normal leading-relaxed">
                 {selected.longDescription || selected.description}

@@ -44,19 +44,22 @@ export function AICore() {
     return () => window.removeEventListener('mousemove', handleMove);
   }, []);
 
-// Neural sphere points
-  const orbs: Orb[] = Array.from({ length: 38 }, () => {
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    const r = 0.8 + Math.random() * 0.2;
-    return {
-      x: r * Math.sin(phi) * Math.cos(theta),
-      y: r * Math.sin(phi) * Math.sin(theta),
-      z: r * Math.cos(phi),
-      r: Math.random() * 2 + 1,
-      pulse: Math.random() * Math.PI * 2,
-    };
-  });
+// Deterministic neural sphere points (Fibonacci sphere distribution — pure, stable & hydration-safe)
+const ORB_POINTS: Orb[] = Array.from({ length: 38 }, (_, i) => {
+  const phi = Math.acos(1 - (2 * (i + 0.5)) / 38);
+  const goldenRatio = 1.618033988749895;
+  const theta = (2 * Math.PI * i) / goldenRatio;
+  const r = 0.85 + (i % 5) * 0.03;
+  return {
+    x: r * Math.sin(phi) * Math.cos(theta),
+    y: r * Math.sin(phi) * Math.sin(theta),
+    z: r * Math.cos(phi),
+    r: 1.5 + (i % 3) * 0.5,
+    pulse: (i * 0.6) % (Math.PI * 2),
+  };
+});
+
+  const orbs = ORB_POINTS;
 
   // Rotating neural-sphere canvas (projected 3D point cloud with connections)
   useEffect(() => {
@@ -215,7 +218,6 @@ className="relative w-[420px] h-[420px] sm:w-[580px] sm:h-[580px] mx-auto group 
         {Array.from({ length: 48 }).map((_, i) => {
           const angle = (i / 48) * Math.PI * 2;
           const outer = 295;
-          const inner = 283;
           return (
             <div
               key={i}

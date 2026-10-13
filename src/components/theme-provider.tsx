@@ -29,11 +29,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
 
     const savedTheme = localStorage.getItem('portfolio_theme') as Theme | null;
-    if (savedTheme) {
-      setThemeState(savedTheme);
-      applyTheme(savedTheme);
-    } else {
-      applyTheme('dark');
+    const active = savedTheme || 'dark';
+    applyTheme(active);
+    if (savedTheme && savedTheme !== 'dark') {
+      React.startTransition(() => {
+        setThemeState(savedTheme);
+      });
     }
     setMounted(true);
   }, []);
